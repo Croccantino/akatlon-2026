@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FireTracker Admin</title>
+  <link rel="icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#e63946" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FireTracker" />
+  <link rel="apple-touch-icon" href="/img/icon-192.png" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-form">
+      <div class="admin-logo"><img src="/img/favicon.png" alt="FireTracker" class="admin-logo-img" /> <span>Fire</span>Tracker</div>
+      <h2>🔒 Accesso Admin</h2>
+      <div class="error-msg" id="loginError"></div>
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <button id="loginBtn">Entra</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- SIDEBAR CONTROLLI -->
+  <div id="sidebar" style="display:none;">
+    <h3 class="sidebar-logo"><img src="/img/favicon.png" alt="FireTracker" /> <span>Fire</span>Tracker Admin</h3>
+    <button class="btn btn-info-hint" id="addHint">📌 Clicca sulla mappa per aggiungere un incendio</button>
+    <input type="text" id="pinDescription" placeholder="Descrizione incendio" />
+    <button class="btn btn-primary" id="saveBtn">💾 Salva segnalazione</button>
+    <button class="locate-btn" id="locateBtn">📍 La mia posizione</button>
+    <a href="/history" class="btn btn-history">🗂️ Storico incendi</a>
+    <button class="btn btn-logout" id="logoutBtn">🚪 Esci</button>
+    <h3 style="margin-top:20px;">Segnalazioni esistenti</h3>
+    <div id="markerList"></div>
+    <h3 style="margin-top:20px;">📡 Segnalazioni utenti</h3>
+    <div id="userEventList"><p style="color:#888;font-size:13px;">Nessuna segnalazione utente.</p></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/admin.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

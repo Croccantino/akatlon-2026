@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FireTracker - Segnalazione Incendi</title>
+  <link rel="icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#e63946" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FireTracker" />
+  <link rel="apple-touch-icon" href="/img/icon-192.png" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+  <link rel="stylesheet" href="/css/index.css" />
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-left">
+      <a href="/" class="nav-logo"><img src="/img/favicon.png" alt="FireTracker" /> <span>Fire</span>Tracker</a>
+    </div>
+    <div class="nav-right">
+      <a href="/" class="nav-link active">🗺️ Mappa</a>
+      <a href="/contatti" class="nav-link">📞 Emergenze</a>
+      <a href="/dati" class="nav-link">📊 Dati</a>
+      <a class="emg-call fire" href="tel:115" title="Chiama i Vigili del Fuoco">🚒 115</a>
+      <a class="emg-call police" href="tel:112" title="Chiama i Carabinieri">🚓 112</a>
+    </div>
+  </nav>
+
+  <!-- BARRA SEGNALAZIONE -->
+  <div id="topbar">
+    <select id="eventType">
+      <option value="incendio">🔥 Incendio</option>
+      <option value="altro">⚠️ Altro pericolo</option>
+    </select>
+    <input type="text" id="eventTypeText" placeholder="Scrivi il tipo di pericolo..." style="display:none;" />
+    <input type="text" id="eventDesc" placeholder="Descrizione (opzionale)..." />
+    <button id="addEventBtn">📌 Segnala</button>
+    <button class="locate-btn" id="locateBtn">📍 La mia posizione</button>
+  </div>
+
+  <!-- PANNELLO EVENTI -->
+  <div id="eventsPanel">
+    <h3>🔥 Segnalazioni</h3>
+    <div id="eventList"><p style="color:#888;font-size:13px;">Nessuna segnalazione. Clicca su "Segnala Incendio" e poi sulla mappa!</p></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="/js/index.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

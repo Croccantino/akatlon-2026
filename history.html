@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storico - FireTracker</title>
+  <link rel="icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#e63946" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FireTracker" />
+  <link rel="apple-touch-icon" href="/img/icon-192.png" />
+  <link rel="stylesheet" href="/css/history.css" />
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-form">
+      <div class="admin-logo"><img src="/img/favicon.png" alt="FireTracker" class="admin-logo-img" /> <span>Fire</span>Tracker</div>
+      <h2>🔒 Storico (Solo Admin)</h2>
+      <div class="error-msg" id="loginError"></div>
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <button id="loginBtn">Entra</button>
+    </div>
+  </div>
+
+  <header>
+    <a href="/admin" class="logo"><img src="/img/favicon.png" alt="FireTracker" class="logo-img" /> <span>Fire</span>Tracker</a>
+    <nav>
+      <a href="/admin">Admin</a>
+      <a href="/history" class="active">Historico</a>
+      <a href="/">Mappa</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>🔥 Storico incendi e aree</h1>
+    <p class="subtitle">Tutte le segnalazioni, gli incendi ufficiali e le aree coinvolte</p>
+
+    <div id="historyContent">
+      <p class="loading">Caricamento...</p>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">🚪 Esci</button>
+  </main>
+
+  <footer>🔥 FireTracker &copy; <span id="year"></span> - Storico riservato</footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="/js/history.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

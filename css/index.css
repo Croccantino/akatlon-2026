@@ -1,0 +1,164 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: Arial, sans-serif; }
+#map { height: 100%; width: 100%; }
+
+/* ===================== NAVBAR ===================== */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1500;
+  background: linear-gradient(135deg, #ff6b35, #e63946);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 20px; height: 56px;
+}
+.nav-left { display: flex; align-items: center; }
+.nav-logo {
+  color: white; text-decoration: none; font-size: 20px; font-weight: bold;
+  display: flex; align-items: center; gap: 8px; letter-spacing: 1px;
+}
+.nav-logo img { width: 36px; height: 36px; border-radius: 8px; }
+.nav-logo span { color: #ffd166; }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-link {
+  color: white; text-decoration: none; font-size: 14px;
+  padding: 7px 12px; border-radius: 6px;
+}
+.nav-link:hover { background: rgba(255,255,255,0.2); }
+.nav-link.active { background: rgba(255,255,255,0.3); font-weight: bold; }
+.emg-call {
+  color: white; text-decoration: none; font-weight: bold;
+  font-size: 15px; padding: 8px 14px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: opacity 0.2s;
+}
+.emg-call:hover { opacity: 0.85; }
+.emg-call.fire { background: #b71c1c; }
+.emg-call.police { background: #1565c0; }
+
+/* ===================== BARRA SEGNALAZIONE ===================== */
+#topbar {
+  position: fixed; top: 66px; left: 50%; transform: translateX(-50%);
+  z-index: 1200; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 12px 20px; border-radius: 8px; display: flex; gap: 10px; align-items: center;
+  max-width: 90%;
+}
+#topbar input {
+  padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;
+}
+#topbar button {
+  padding: 8px 16px; border: 0; border-radius: 4px; cursor: pointer;
+  background: #e63946; color: white; font-size: 14px;
+}
+#topbar button:hover { background: #c12c38; }
+#topbar select {
+  padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+  background: #fff; font-size: 14px;
+}
+#topbar #eventTypeText {
+  width: 190px;
+  border-color: #f9a825;
+  background: #fffde7;
+}
+
+/* Icona fiamma marker */
+.fire-icon {
+  background: none !important;
+  border: none !important;
+}
+.fire-icon img {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 4px rgba(230, 57, 70, 0.6));
+}
+
+/* Emoji fuoco marker client */
+.fire-emoji {
+  background: none !important;
+  border: none !important;
+  font-size: 26px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 4px rgba(230, 57, 70, 0.6));
+}
+
+/* Emoji pericolo marker client */
+.danger-icon {
+  background: none !important;
+  border: none !important;
+  font-size: 26px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.8));
+}
+
+#eventsPanel {
+  position: fixed; left: 10px; top: 145px; bottom: 10px; width: 280px;
+  background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 15px; overflow-y: auto; z-index: 1100; border-radius: 8px;
+}
+#eventsPanel h3 { margin-bottom: 15px; color: #333; }
+.event-item {
+  padding: 10px; border: 1px solid #eee; border-radius: 4px;
+  margin-bottom: 8px; background: #fafafa; cursor: pointer;
+}
+.event-item:hover { background: #f0f0f0; }
+.event-item .title { font-weight: bold; }
+.event-item .desc { font-size: 12px; color: #666; margin-top: 5px; }
+
+.event-popup { max-width: 250px; }
+.event-popup h4 { margin-bottom: 5px; }
+.event-popup p { font-size: 13px; color: #333; }
+
+.locate-btn {
+  padding: 8px 12px; border: 0; border-radius: 4px; cursor: pointer;
+  background: #34a853; color: white; font-size: 14px;
+}
+.locate-btn:hover { background: #2d8f47; }
+
+/* ===== TASTI NAVIGAZIONE MAPPA ===== */
+.nav-control {
+  display: flex; flex-direction: column; gap: 4px;
+  background: none !important; box-shadow: none !important;
+}
+.nav-btn {
+  width: 40px; height: 40px; border: 0; border-radius: 6px;
+  background: #fff; color: #333; font-size: 20px; font-weight: bold;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.nav-btn:hover { background: #f0f0f0; }
+.nav-btn.nav-locate { background: #34a853; color: white; font-size: 17px; }
+.nav-btn.nav-locate:hover { background: #2d8f47; }
+
+/* ==== MOBILE RESPONSIVE ==== */
+@media (max-width: 768px) {
+  #navbar { padding: 0 10px; height: 54px; flex-wrap: nowrap; }
+  .nav-logo img { width: 30px; height: 30px; }
+  .nav-logo { font-size: 16px; }
+  .nav-link { font-size: 12px; padding: 6px 8px; }
+  .emg-call { font-size: 13px; padding: 6px 10px; }
+  .nav-right { gap: 5px; flex-wrap: nowrap; }
+  #topbar {
+    position: fixed; top: 56px; left: 0; right: 0; bottom: auto;
+    transform: none; width: 100%; max-width: 100%;
+    border-radius: 0; border-bottom: 1px solid #eee;
+    flex-direction: column; gap: 6px; padding: 8px 10px;
+    overflow-y: auto; max-height: 52vh;
+  }
+  #topbar input, #topbar select {
+    width: 100%; font-size: 16px; padding: 10px;
+  }
+  #topbar button {
+    width: 100%; font-size: 16px; padding: 12px;
+  }
+  #eventsPanel {
+    left: 0; right: 0; top: auto; bottom: 0;
+    width: 100%; max-height: 30vh; border-radius: 12px 12px 0 0;
+    border-top: 2px solid #e63946;
+  }
+}
+@media (max-width: 480px) {
+  #eventsPanel { max-height: 25vh; }
+}

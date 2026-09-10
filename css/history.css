@@ -1,0 +1,111 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: Arial, sans-serif; background: #f5f5f5; color: #333;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+
+/* ==== LOGIN ==== */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 2000;
+  background: #f5f5f5;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-form {
+  background: #fff; padding: 30px; border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center; width: 320px;
+}
+.admin-logo {
+  font-size: 28px; font-weight: bold; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.admin-logo-img { width: 46px; height: 46px; border-radius: 8px; }
+.admin-logo span {
+  background: linear-gradient(135deg, #ff6b35, #e63946);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.login-form h2 { margin-bottom: 20px; color: #333; }
+.login-form input {
+  width: 100%; padding: 12px; margin-bottom: 15px;
+  border: 1px solid #ccc; border-radius: 4px; font-size: 16px;
+}
+.login-form button {
+  width: 100%; padding: 12px;
+  background: #1a73e8; color: white; border: 0;
+  border-radius: 4px; font-size: 16px; cursor: pointer;
+}
+.login-form button:hover { background: #1765cc; }
+.error-msg { color: #d93025; margin-bottom: 10px; min-height: 20px; }
+
+header {
+  background: linear-gradient(135deg, #ff6b35, #e63946);
+  color: white; padding: 12px 25px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.logo { color: white; text-decoration: none; font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+.logo-img { width: 36px; height: 36px; border-radius: 8px; }
+.logo span { color: #ffd166; }
+nav a {
+  color: white; text-decoration: none; margin-left: 18px;
+  padding: 6px 12px; border-radius: 4px; font-size: 14px;
+}
+nav a:hover { background: rgba(255,255,255,0.2); }
+nav a.active { background: rgba(255,255,255,0.3); font-weight: bold; }
+
+main { flex: 1; max-width: 1000px; width: 100%; margin: 0 auto; padding: 25px 20px; }
+h1 { text-align: center; font-size: 26px; color: #e63946; margin-bottom: 5px; }
+.subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+.loading { text-align: center; color: #888; padding: 30px; }
+
+.section { margin-bottom: 30px; }
+.section h2 {
+  font-size: 18px; margin-bottom: 12px; color: #333;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 2px solid #eee; padding-bottom: 8px;
+}
+.section h2 .count {
+  background: #e63946; color: white; border-radius: 10px;
+  font-size: 12px; padding: 2px 9px;
+}
+
+.card {
+  background: #fff; border-radius: 10px; padding: 14px 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08); margin-bottom: 12px;
+  border-left: 5px solid #e63946;
+}
+.card.event-card { border-left-color: #f9a825; background: #fffde7; }
+.card.shape-card { border-left-color: #1a73e8; }
+
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.card-title { font-weight: bold; font-size: 15px; }
+.card-time { font-size: 12px; color: #888; }
+.card-body { margin-top: 8px; font-size: 13px; color: #555; line-height: 1.5; }
+.card-body .desc { color: #333; }
+.badge {
+  display: inline-block; border-radius: 10px; padding: 2px 10px;
+  font-size: 11px; font-weight: bold; text-transform: uppercase;
+}
+.badge.incendio { background: #fdecea; color: #c62828; }
+.badge.segnalazione { background: #fff8e1; color: #f9a825; }
+.badge.area { background: #e8f0fe; color: #1a73e8; }
+
+.logout-btn {
+  display: block; margin: 20px auto 0; padding: 12px 30px;
+  background: #d93025; color: white; border: 0; border-radius: 6px;
+  font-size: 15px; cursor: pointer;
+}
+.logout-btn:hover { background: #b9261f; }
+
+footer {
+  background: #333; color: #ccc; text-align: center;
+  padding: 15px; font-size: 13px;
+}
+
+/* ==== MOBILE ==== */
+@media (max-width: 600px) {
+  header { flex-direction: column; gap: 8px; padding: 10px 15px; }
+  nav a { margin: 0 5px; }
+  .login-form { width: 90%; max-width: 320px; }
+  .card-head { flex-direction: column; align-items: flex-start; }
+}

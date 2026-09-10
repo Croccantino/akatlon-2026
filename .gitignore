@@ -1,0 +1,7 @@
+server.log
+config.json
+markers.json
+events.json
+shapes.json
+node_modules/
+*.log
