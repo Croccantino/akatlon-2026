@@ -1,4 +1,4 @@
-const CACHE = 'fireracker-v6';
+const CACHE = 'fireracker-v30';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   '/js/index.js',
   '/js/admin.js',
   '/js/history.js',
+  '/js/zona_pericolo.js',
   '/img/favicon.png',
   '/img/logo.png',
   '/img/marker.png',

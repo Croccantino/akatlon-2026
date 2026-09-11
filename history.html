@@ -29,14 +29,14 @@
     <a href="/admin" class="logo"><img src="/img/favicon.png" alt="FireTracker" class="logo-img" /> <span>Fire</span>Tracker</a>
     <nav>
       <a href="/admin">Admin</a>
-      <a href="/history" class="active">Historico</a>
+      <a href="/history" class="active">Storico</a>
       <a href="/">Mappa</a>
     </nav>
   </header>
 
   <main>
     <h1>🔥 Storico incendi e aree</h1>
-    <p class="subtitle">Tutte le segnalazioni, gli incendi ufficiali e le aree coinvolte</p>
+    <p class="subtitle">Tutte le segnalazioni, gli incendi ufficiali e le aree — incluse quelle eliminate</p>
 
     <div id="historyContent">
       <p class="loading">Caricamento...</p>
@@ -46,6 +46,19 @@
   </main>
 
   <footer>🔥 FireTracker &copy; <span id="year"></span> - Storico riservato</footer>
+
+  <!-- CONFERMA ELIMINAZIONE (no native confirm: bloccato su PWA/mobile) -->
+  <div id="confirmModal" class="confirm-modal">
+    <div class="confirm-box">
+      <p id="confirmText">Eliminare definitivamente questa voce?</p>
+      <p class="confirm-warn">Verrà rimossa anche dalla mappa e dall'admin.</p>
+      <div class="confirm-actions">
+        <button class="btn-annulla" id="confirmNo">Annulla</button>
+        <button class="btn-elimina" id="confirmYes">🗑️ Elimina</button>
+      </div>
+    </div>
+  </div>
+
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
   <script src="/js/history.js"></script>
   <script>

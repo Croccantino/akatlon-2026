@@ -25,7 +25,7 @@
     </div>
     <div class="nav-right">
       <a href="/" class="nav-link active">🗺️ Mappa</a>
-      <a href="/contatti" class="nav-link">📞 Emergenze</a>
+      <a href="/contatti" class="nav-link">📞 Contatti di emergenza</a>
       <a href="/dati" class="nav-link">📊 Dati</a>
       <a class="emg-call fire" href="tel:115" title="Chiama i Vigili del Fuoco">🚒 115</a>
       <a class="emg-call police" href="tel:112" title="Chiama i Carabinieri">🚓 112</a>
@@ -42,6 +42,7 @@
     <input type="text" id="eventDesc" placeholder="Descrizione (opzionale)..." />
     <button id="addEventBtn">📌 Segnala</button>
     <button class="locate-btn" id="locateBtn">📍 La mia posizione</button>
+    <div id="reportHint" style="display:none;">&nbsp;</div>
   </div>
 
   <!-- PANNELLO EVENTI -->
@@ -52,6 +53,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+  <script src="/js/zona_pericolo.js"></script>
   <script src="/js/index.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

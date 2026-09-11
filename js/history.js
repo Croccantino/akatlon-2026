@@ -43,55 +43,104 @@ function shapeCoordsText(s) {
     const pt = s.coords[0][0];
     return pt.lat.toFixed(5) + ', ' + pt.lng.toFixed(5) + ' ...';
   }
-  if (s.type === 'rectangle' && s.bounds) {
-    const b = s.bounds;
-    if (b._southWest) return b._southWest.lat.toFixed(5) + ', ' + b._southWest.lng.toFixed(5);
+  if (s.type === 'rectangle' && s.bounds && s.bounds._southWest) {
+    return s.bounds._southWest.lat.toFixed(5) + ', ' + s.bounds._southWest.lng.toFixed(5);
   }
   return '—';
 }
 
-function historyHtml(data) {
-  const markers = data.markers || [];
-  const events = data.events || [];
-  const shapes = data.shapes || [];
+function entryIcon(type, d) {
+  if (type === 'marker') return '🔥';
+  if (type === 'event') return (d && d.type === 'altro') ? '⚠️' : '🔥';
+  return '🗺️';
+}
 
+function entryBadge(type, action) {
+  const base = type === 'marker' ? ['incendio', 'Incendio']
+    : type === 'event' ? ['segnalazione', 'Utenza']
+    : ['area', 'Area'];
+  const extra = action === 'deleted' ? ' del'
+    : action === 'estinto' ? ' estinto' : '';
+  const estinto = action === 'estinto' ? ' badge-estinto' : '';
+  return '<span class="badge ' + base[0] + estinto + '">' + base[1] + extra + '</span>';
+}
+
+function entryTitle(type, d) {
+  if (type === 'marker') return esc(d.title || 'Incendio');
+  if (type === 'event') return esc(d.title || 'Segnalazione');
+  return esc(shapeLabel(d));
+}
+
+function entryBody(type, d) {
+  if (type === 'marker' || type === 'event') {
+    const lat = d.lat, lng = d.lng;
+    const geo = (lat != null && lng != null)
+      ? '<div>📍 ' + Number(lat).toFixed(5) + ', ' + Number(lng).toFixed(5) + '</div>'
+      : '';
+    const desc = d.description ? '<div class="desc">' + esc(d.description) + '</div>' : '';
+    return desc + geo;
+  }
+  return '<div>📍 ' + esc(shapeCoordsText(d)) + '</div>';
+}
+
+function historyHtml(entries) {
+  if (entries.length === 0) {
+    return '<p class="loading">Nessun evento registrato.</p>';
+  }
   let html = '';
-
-  html += '<div class="section"><h2>🔥 Incendi ufficiali <span class="count">' + markers.length + '</span></h2>';
-  if (markers.length === 0) html += '<p class="loading">Nessun incendio ufficiale.</p>';
-  markers.forEach(m => {
-    html += '<div class="card"><div class="card-head">' +
-      '<div class="card-title">🔥 ' + esc(m.title || 'Incendio') + ' <span class="badge incendio">Incendio</span></div>' +
-      '<div class="card-time">' + fmtDate(m.createdAt) + '</div></div>' +
-      '<div class="card-body"><div class="desc">' + esc(m.description || '') + '</div>' +
-      '<div>📍 ' + m.lat.toFixed(5) + ', ' + m.lng.toFixed(5) + '</div></div></div>';
+  entries.slice().reverse().forEach(e => {
+    const d = e.data || {};
+    const deleted = e.action === 'deleted';
+    const estinto = e.action === 'estinto';
+    const nota = deleted ? 'rimossa dalla mappa' : estinto ? 'estinta, rimossa dalla mappa' : '';
+    html += '<div class="card ' + (deleted ? 'deleted-card' : estinto ? 'estinto-card' : '') + '">' +
+      '<div class="card-head">' +
+      '<div class="card-title">' + entryIcon(e.type, d) + ' ' + entryTitle(e.type, d) +
+        ' ' + entryBadge(e.type, e.action) +
+        (nota ? ' <span class="del-note">' + nota + '</span>' : '') +
+      '</div>' +
+      '<div class="card-actions">' +
+        '<div class="card-time">' + fmtDate(e.createdAt) + '</div>' +
+        '<button class="del-btn" title="Elimina dallo storico" onclick="deleteEntry(' + e.id + ')">🗑️</button>' +
+      '</div>' +
+      '</div>' +
+      '<div class="card-body">' + entryBody(e.type, d) + '</div>' +
+      '</div>';
   });
-  html += '</div>';
-
-  html += '<div class="section"><h2>⚠️ Segnalazioni utenti <span class="count">' + events.length + '</span></h2>';
-  if (events.length === 0) html += '<p class="loading">Nessuna segnalazione utente.</p>';
-  events.forEach(ev => {
-    const icon = ev.type === 'altro' ? '⚠️' : '🔥';
-    html += '<div class="card event-card"><div class="card-head">' +
-      '<div class="card-title">' + icon + ' ' + esc(ev.title || 'Segnalazione') + ' <span class="badge segnalazione">Utenza</span></div>' +
-      '<div class="card-time">' + fmtDate(ev.createdAt) + '</div></div>' +
-      '<div class="card-body"><div class="desc">' + esc(ev.description || '') + '</div>' +
-      '<div>📍 ' + ev.lat.toFixed(5) + ', ' + ev.lng.toFixed(5) + '</div></div></div>';
-  });
-  html += '</div>';
-
-  html += '<div class="section"><h2>🗺️ Aree coinvolte <span class="count">' + shapes.length + '</span></h2>';
-  if (shapes.length === 0) html += '<p class="loading">Nessuna area disegnata.</p>';
-  shapes.forEach(s => {
-    html += '<div class="card shape-card"><div class="card-head">' +
-      '<div class="card-title">🗺️ ' + esc(shapeLabel(s)) + ' <span class="badge area">Area</span></div>' +
-      '<div class="card-time">' + fmtDate(s.createdAt) + '</div></div>' +
-      '<div class="card-body"><div>📍 ' + esc(shapeCoordsText(s)) + '</div></div></div>';
-  });
-  html += '</div>';
-
   return html;
 }
+
+let pendingDeleteId = null;
+
+function deleteEntry(id) {
+  pendingDeleteId = id;
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+
+document.getElementById('confirmNo').addEventListener('click', () => {
+  pendingDeleteId = null;
+  document.getElementById('confirmModal').style.display = 'none';
+});
+
+document.getElementById('confirmYes').addEventListener('click', async () => {
+  document.getElementById('confirmModal').style.display = 'none';
+  const id = pendingDeleteId;
+  pendingDeleteId = null;
+  if (id == null) return;
+  const res = await fetch('/api/history/' + id, {
+    method: 'DELETE',
+    headers: { 'Authorization': authToken }
+  });
+  if (!res.ok) {
+    const msg = res.status === 401
+      ? 'Sessione scaduta: fai di nuovo login.'
+      : 'Errore: voce non trovata.';
+    document.getElementById('historyContent').innerHTML =
+      '<p style="text-align:center;color:#d93025;">' + msg + '</p>';
+    return;
+  }
+  loadHistory();
+});
 
 // === LOAD ===
 async function loadHistory() {
@@ -101,7 +150,7 @@ async function loadHistory() {
     return;
   }
   const data = await res.json();
-  document.getElementById('historyContent').innerHTML = historyHtml(data);
+  document.getElementById('historyContent').innerHTML = historyHtml(data.entries || []);
 }
 
 // === VERIFICA TOKEN ALL'AVVIO ===
@@ -142,7 +191,9 @@ let sse = null;
 function connectStream() {
   sse = new EventSource('/api/stream');
   sse.onmessage = e => {
-    loadHistory();
+    let msg;
+    try { msg = JSON.parse(e.data); } catch (err) { return; }
+    if (msg.type === 'history') loadHistory();
   };
   sse.onerror = () => {
     if (sse) sse.close();

@@ -3,5 +3,6 @@ config.json
 markers.json
 events.json
 shapes.json
+history.json
 node_modules/
 *.log

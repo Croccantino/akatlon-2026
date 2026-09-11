@@ -15,10 +15,12 @@ const fireIcon = L.divIcon({
 let authToken = sessionStorage.getItem('adminToken') || null;
 let markers = [];
 let userEvents = [];
+let userShapes = [];
 let pendingMarker = null;
 let pendingDescription = '';
 let markerGroup = null;
 let adminEventGroup = null;
+let adminShapeGroup = null;
 
 // Icona segnalazione utente (admin vede le segnalazioni client)
 const eventPinIcon = L.divIcon({
@@ -51,6 +53,7 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     document.getElementById('sidebar').style.display = 'block';
     loadMarkers();
     loadEvents();
+    loadShapes();
     connectStream();
   } else {
     document.getElementById('loginError').textContent = 'Password errata';
@@ -86,13 +89,24 @@ function renderMarkers() {
         <div class="name">🔥 ${m.title || 'Incendio'}</div>
         <div class="coords">${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}</div>
       </div>
-      <button class="btn btn-danger" style="width:auto;margin:0;padding:5px 10px;" onclick="deleteMarker(${m.id})">🗑️</button>
+      <div class="user-event-actions">
+        <button class="btn btn-success estinto-btn" style="width:auto;margin:0;padding:5px 10px;" onclick="extinguiMarker(${m.id})">🟢 Estinto</button>
+        <button class="btn btn-danger" style="width:auto;margin:0;padding:5px 10px;" onclick="deleteMarker(${m.id})">🗑️</button>
+      </div>
     `;
     list.appendChild(div);
 
     L.marker([m.lat, m.lng], { icon: fireIcon }).addTo(markerGroup)
       .bindPopup(`<b>🔥 ${m.title || 'Incendio'}</b><br>${m.description || ''}`);
   });
+}
+
+async function extinguiMarker(id) {
+  const res = await fetch(`/api/markers/${id}/estinto`, {
+    method: 'POST',
+    headers: { 'Authorization': authToken }
+  });
+  if (res.ok) loadMarkers();
 }
 
 // === EVENTI UTENTI (admin li vede e li può approvare/eliminare) ===
@@ -124,6 +138,7 @@ function renderUserEvents() {
       </div>
       <div class="user-event-actions">
         <button class="btn btn-primary" style="width:auto;margin:0;padding:5px 10px;" onclick="useEventPosition(${ev.id})">📌 Aggiungi marker</button>
+        <button class="btn btn-success estinto-btn" style="width:auto;margin:0;padding:5px 10px;" onclick="extinguiEvent(${ev.id})">🟢 Estinto</button>
         <button class="btn btn-danger" style="width:auto;margin:0;padding:5px 10px;" onclick="deleteUserEvent(${ev.id})">🗑️</button>
       </div>
     `;
@@ -155,6 +170,77 @@ async function deleteUserEvent(id) {
   if (res.ok) loadEvents();
 }
 
+async function extinguiEvent(id) {
+  const res = await fetch(`/api/events/${id}/estinto`, {
+    method: 'POST',
+    headers: { 'Authorization': authToken }
+  });
+  if (res.ok) loadEvents();
+}
+
+// === AREE DISEGNATE (admin le vede e le può eliminare) ===
+async function loadShapes() {
+  const res = await fetch('/api/shapes');
+  userShapes = await res.json();
+  renderShapes();
+}
+
+function renderShapes() {
+  const list = document.getElementById('shapeList');
+  list.innerHTML = '';
+  if (adminShapeGroup) map.removeLayer(adminShapeGroup);
+  adminShapeGroup = L.layerGroup().addTo(map);
+
+  if (userShapes.length === 0) {
+    list.innerHTML = '<p style="color:#888;font-size:13px;">Nessuna area disegnata.</p>';
+    return;
+  }
+
+  userShapes.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'event-item';
+    const label = { polygon: 'Poligono', rectangle: 'Rettangolo', circle: 'Cerchio' }[s.type] || s.type;
+    const geo = s.type === 'circle'
+      ? s.center.lat.toFixed(4) + ', ' + s.center.lng.toFixed(4)
+      : 'Area';
+    div.innerHTML = `
+      <div>
+        <div class="name">🗺️ ${label}</div>
+        <div class="coords">${geo}${s.createdAt ? ' · ' + new Date(s.createdAt).toLocaleString() : ''}</div>
+      </div>
+      <button class="btn btn-danger" style="width:auto;margin:0;padding:5px 10px;" onclick="deleteShape(${s.id})">🗑️</button>
+    `;
+    list.appendChild(div);
+
+    let layer;
+    try {
+      if (s.type === 'polygon') {
+        layer = L.polygon(s.coords);
+      } else if (s.type === 'rectangle') {
+        const b = s.bounds;
+        if (b && b._southWest && b._northEast) {
+          layer = L.rectangle([[b._southWest.lat, b._southWest.lng], [b._northEast.lat, b._northEast.lng]]);
+        } else if (Array.isArray(b)) {
+          layer = L.rectangle(b);
+        }
+      } else if (s.type === 'circle') {
+        layer = L.circle(s.center, { radius: s.radius });
+      }
+    } catch (err) {
+      console.error('shape non valida', s.id, err);
+    }
+    if (layer) {
+      layer.options.shapeId = s.id;
+      adminShapeGroup.addLayer(layer);
+    }
+  });
+}
+
+async function deleteShape(id) {
+  const res = await fetch('/api/shapes/' + id, { method: 'DELETE' });
+  if (res.ok) loadShapes();
+}
+
 // === STREAM REALTIME (admin <-> client) ===
 let sse = null;
 function connectStream() {
@@ -164,6 +250,7 @@ function connectStream() {
     try { msg = JSON.parse(e.data); } catch (err) { return; }
     if (msg.type === 'markers') loadMarkers();
     if (msg.type === 'events') loadEvents();
+    if (msg.type === 'shapes') loadShapes();
   };
   sse.onerror = () => {
     if (sse) sse.close();
@@ -258,6 +345,7 @@ if (authToken) {
       document.getElementById('sidebar').style.display = 'block';
       loadMarkers();
       loadEvents();
+      loadShapes();
       connectStream();
     } else {
       authToken = null;

@@ -67,7 +67,11 @@ html, body { height: 100%; font-family: Arial, sans-serif; }
 .btn-logout:hover { background: #b9261f; }
 .btn-danger { background: #f28b82; color: white; }
 .btn-danger:hover { background: #e0665c; }
+.btn-success { background: #34a853; color: white; }
+.btn-success:hover { background: #2d8f47; }
 .btn-info-hint { background: #fff3cd; color: #856404; border: 1px solid #ffeeba !important; }
+
+.user-event-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 #markerList { margin-top: 15px; }
 .marker-item {

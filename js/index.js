@@ -1,4 +1,4 @@
-const map = L.map('map').setView([41.9, 12.5], 6);
+const map = L.map('map', { zoomControl: false }).setView([41.9, 12.5], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
@@ -95,7 +95,71 @@ function refreshEventMarkers() {
       .bindPopup(`<div class="event-popup"><h4>${ev.type === 'altro' ? '⚠️' : '🔥'} ${ev.title}</h4><p>${ev.description || ''}</p></div>`);
     eventMarkers.push(m);
   });
+  aggiornaZonePericolo();
 }
+
+// === ZONA DI PERICOLO AUTOMATICA (modello calcolaZonaCompleta) ===
+let zonaPericoloGroup = null;
+let ultimoFingerprint = '';
+let shapesCache = [];
+function combustibilePerEvento(ev) {
+  if (ev.type === 'incendio') return 'macchia';
+  return 'prato';
+}
+function raggioAreaRossaEvento(ev) {
+  let best = 0;
+  let bestKm = 1;
+  for (const s of shapesCache) {
+    if (s.type !== 'circle' || !s.center) continue;
+    const d = distanzaKm(ev.lat, ev.lng, s.center.lat, s.center.lng);
+    if (d < bestKm) { bestKm = d; best = s.radius || 0; }
+  }
+  return best;
+}
+async function creaZonePerEvento(incendi) {
+  const venti = {};
+  const segnatura = [];
+  for (const ev of incendi) {
+    try {
+      const w = await ottieniVentoMigliore(ev.lat, ev.lng);
+      venti[ev.id] = w;
+      segnatura.push(ev.id + ':' + Math.round(w.direzioneGradi) + ':' + w.velocitaKmh.toFixed(1) + ':' + w.fonte + ':r' + Math.round(raggioAreaRossaEvento(ev)));
+    } catch (err) {
+      venti[ev.id] = null;
+      segnatura.push(ev.id + ':err');
+    }
+  }
+  return { venti, segnatura: segnatura.join('|') };
+}
+async function aggiornaZonePericolo() {
+  const incendi = clientEvents.filter(ev => ev.type !== 'altro');
+  if (incendi.length === 0) {
+    if (zonaPericoloGroup) { map.removeLayer(zonaPericoloGroup); zonaPericoloGroup = null; }
+    ultimoFingerprint = '';
+    return;
+  }
+  const { venti, segnatura } = await creaZonePerEvento(incendi);
+  if (segnatura === ultimoFingerprint && zonaPericoloGroup) return;
+  ultimoFingerprint = segnatura;
+  if (zonaPericoloGroup) map.removeLayer(zonaPericoloGroup);
+  zonaPericoloGroup = L.layerGroup({ pane: 'overlayPane' }).addTo(map);
+  for (const ev of incendi) {
+    const raggioRosso = raggioAreaRossaEvento(ev);
+    const gialla = creaZonaGialla(map, ev.lat, ev.lng, raggioRosso + 60);
+    zonaPericoloGroup.addLayer(gialla);
+    try {
+      const zona = await creaZonaPericoloDaMeteo(
+        map, ev.lat, ev.lng, combustibilePerEvento(ev), venti[ev.id], raggioRosso
+      );
+      if (zona) zonaPericoloGroup.addLayer(zona);
+    } catch (err) {
+      console.warn('Vento non disponibile, uso cerchio base:', err);
+      const cerchio = creaZonaPericolo(map, ev.lat, ev.lng, 300);
+      zonaPericoloGroup.addLayer(cerchio);
+    }
+  }
+}
+setInterval(aggiornaZonePericolo, 2000);
 
 // === SELEZIONE TIPO EVENTO ===
 const eventTypeSelect = document.getElementById('eventType');
@@ -109,78 +173,25 @@ eventTypeSelect.addEventListener('change', () => {
 
 // === AGGIUNGI EVENTO (click mappa quando attivo) ===
 let addModeActive = false;
+let pendingReport = null;
+let previewCircle = null;
+const addEventBtn = document.getElementById('addEventBtn');
+const reportHint = document.getElementById('reportHint');
 
-document.getElementById('addEventBtn').addEventListener('click', () => {
-  const type = eventTypeSelect.value;
-  if (type === 'altro' && !eventTypeText.value.trim()) {
-    alert('Scrivi il tipo di pericolo nel campo apposito');
-    return;
-  }
-  addModeActive = true;
-  alert('Clicca sulla mappa nel punto dove vuoi segnalare');
-});
-
-map.on('click', e => {
-  if (!addModeActive) return;
-  const type = eventTypeSelect.value;
-  const title = type === 'incendio' ? 'Incendio' : eventTypeText.value.trim();
-  const description = document.getElementById('eventDesc').value.trim();
-  addModeActive = false;
+function resetReportUI() {
+  addEventBtn.textContent = '📌 Segnala';
+  if (reportHint) reportHint.style.display = 'none';
   eventTypeSelect.value = 'incendio';
   eventTypeText.value = '';
   eventTypeText.style.display = 'none';
   document.getElementById('eventDesc').value = '';
-  postEvent({ type, title, description, lat: e.latlng.lat, lng: e.latlng.lng });
-});
-
-// === DISEGNO AREE (salvate sul server, visibili in storico) ===
-const drawnItems = new L.FeatureGroup();
-map.addLayer(drawnItems);
-
-function shapeDataFromLayer(layer) {
-  if (layer instanceof L.Rectangle) return { type: 'rectangle', bounds: layer.getBounds() };
-  if (layer instanceof L.Polygon) return { type: 'polygon', coords: layer.getLatLngs() };
-  if (layer instanceof L.Circle) return { type: 'circle', center: layer.getLatLng(), radius: layer.getRadius() };
-  return null;
 }
 
-async function loadShapes() {
-  const res = await fetch('/api/shapes');
-  const list = await res.json();
-  drawnItems.clearLayers();
-  list.forEach(s => {
-    let layer;
-    if (s.type === 'polygon') {
-      layer = L.polygon(s.coords);
-    } else if (s.type === 'rectangle') {
-      layer = L.rectangle(s.bounds);
-    } else if (s.type === 'circle') {
-      layer = L.circle(s.center, { radius: s.radius });
-    }
-    if (layer) {
-      layer.options.shapeId = s.id;
-      drawnItems.addLayer(layer);
-    }
-  });
+function rimuoviPreviewCerchio() {
+  if (previewCircle) { map.removeLayer(previewCircle); previewCircle = null; }
 }
 
-const drawControl = new L.Control.Draw({
-  draw: {
-    polygon: { showArea: true, allowIntersection: false, shapeOptions: { color: '#e63946' } },
-    circle: { showRadius: true },
-    rectangle: {},
-    polyline: false,
-    marker: false,
-    circlemarker: false
-  },
-  edit: { featureGroup: drawnItems, remove: true }
-});
-map.addControl(drawControl);
-
-map.on(L.Draw.Event.CREATED, e => {
-  const layer = e.layer;
-  const data = shapeDataFromLayer(layer);
-  if (!data) return;
+function salvaSegnalazioneConArea(p, layer, data) {
   drawnItems.addLayer(layer);
   fetch('/api/shapes', {
     method: 'POST',
@@ -188,29 +199,103 @@ map.on(L.Draw.Event.CREATED, e => {
     body: JSON.stringify(data)
   })
     .then(r => r.json())
-    .then(s => { layer.options.shapeId = s.id; });
+    .then(s => { layer.options.shapeId = s.id; loadShapes(); })
+    .catch(err => console.warn('area non salvata:', err));
+  postEvent({ type: p.type, title: p.title, description: p.description, lat: p.lat, lng: p.lng });
+}
+
+document.getElementById('addEventBtn').addEventListener('click', () => {
+  if (pendingReport) {
+    pendingReport = null;
+    rimuoviPreviewCerchio();
+    resetReportUI();
+    return;
+  }
+  const type = eventTypeSelect.value;
+  if (type === 'altro' && !eventTypeText.value.trim()) {
+    reportHint.textContent = '⚠️ Scrivi il tipo di pericolo nel campo apposito';
+    reportHint.style.display = 'block';
+    return;
+  }
+  addModeActive = true;
+  reportHint.textContent = '📍 Tocca la mappa nel punto dell\u2019incendio...';
+  reportHint.style.display = 'block';
 });
 
-map.on(L.Draw.Event.EDITED, e => {
-  e.layers.eachLayer(layer => {
-    const data = shapeDataFromLayer(layer);
-    if (data && layer.options.shapeId) {
-      fetch('/api/shapes/' + layer.options.shapeId, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-    }
-  });
+map.on('click', e => {
+  if (pendingReport) {
+    const raggio = distanzaKm(pendingReport.lat, pendingReport.lng, e.latlng.lat, e.latlng.lng) * 1000;
+    const raggioFinale = Math.max(300, Math.round(raggio));
+    rimuoviPreviewCerchio();
+    const p = pendingReport;
+    pendingReport = null;
+    const layer = L.circle([p.lat, p.lng], {
+      radius: raggioFinale,
+      color: '#e63946', fillColor: '#e63946', fillOpacity: 0.25, weight: 2
+    });
+    resetReportUI();
+    salvaSegnalazioneConArea(p, layer, { type: 'circle', center: { lat: p.lat, lng: p.lng }, radius: raggioFinale });
+    return;
+  }
+  if (!addModeActive) return;
+  const type = eventTypeSelect.value;
+  const title = type === 'incendio' ? 'Incendio' : eventTypeText.value.trim();
+  const description = document.getElementById('eventDesc').value.trim();
+  addModeActive = false;
+  pendingReport = { type, title, description, lat: e.latlng.lat, lng: e.latlng.lng };
+  addEventBtn.textContent = '🗑️ Annulla area';
+  reportHint.textContent = '⭕ Tocca di nuovo per fissare il raggio dell\u2019area (min 300 m)';
+  reportHint.style.display = 'block';
+  previewCircle = L.circle([e.latlng.lat, e.latlng.lng], {
+    radius: 300,
+    color: '#e63946', fillColor: '#e63946', fillOpacity: 0.2, weight: 1
+  }).addTo(map);
 });
 
-map.on(L.Draw.Event.DELETED, e => {
-  e.layers.eachLayer(layer => {
-    if (layer.options.shapeId) {
-      fetch('/api/shapes/' + layer.options.shapeId, { method: 'DELETE' });
+map.on('mousemove', e => {
+  if (previewCircle && pendingReport) {
+    const r = distanzaKm(pendingReport.lat, pendingReport.lng, e.latlng.lat, e.latlng.lng) * 1000;
+    previewCircle.setRadius(Math.max(50, r));
+  }
+});
+
+// === DISEGNO AREE (salvate sul server, visibili in storico) ===
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
+
+async function loadShapes() {
+  const res = await fetch('/api/shapes');
+  const list = await res.json();
+  shapesCache = list;
+  drawnItems.clearLayers();
+  list.forEach(s => {
+    let layer;
+    try {
+      if (s.type === 'polygon') {
+        layer = L.polygon(s.coords, { color: '#e63946', fillColor: '#e63946', fillOpacity: 0.25 });
+      } else if (s.type === 'rectangle') {
+        const b = s.bounds;
+        if (b && b._southWest && b._northEast) {
+          layer = L.rectangle(
+            [[b._southWest.lat, b._southWest.lng], [b._northEast.lat, b._northEast.lng]],
+            { color: '#e63946', fillColor: '#e63946', fillOpacity: 0.25 }
+          );
+        } else if (Array.isArray(b)) {
+          layer = L.rectangle(b, { color: '#e63946', fillColor: '#e63946', fillOpacity: 0.25 });
+        }
+      } else if (s.type === 'circle') {
+        layer = L.circle(s.center, { radius: s.radius, color: '#e63946', fillColor: '#e63946', fillOpacity: 0.25 });
+      }
+    } catch (err) {
+      console.error('shape non valida', s.id, err);
+      return;
+    }
+    if (layer) {
+      layer.options.shapeId = s.id;
+      drawnItems.addLayer(layer);
     }
   });
-});
+}
 
 // === GEOLOCALIZZAZIONE: CENTRA LA TUA POSIZIONE ===
 let userLocationLayer = null;

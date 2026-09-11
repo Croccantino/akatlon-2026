@@ -58,6 +58,11 @@ html, body { height: 100%; font-family: Arial, sans-serif; }
   border-color: #f9a825;
   background: #fffde7;
 }
+#reportHint {
+  padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold;
+  background: #fff3cd; color: #856404; border: 1px solid #ffeeba;
+  white-space: nowrap;
+}
 
 /* Icona fiamma marker */
 .fire-icon {
@@ -121,6 +126,16 @@ html, body { height: 100%; font-family: Arial, sans-serif; }
   display: flex; flex-direction: column; gap: 4px;
   background: none !important; box-shadow: none !important;
 }
+
+/* ===== BARRA DI DISEGNO VICINO AI COMANDI IN BASSO ===== */
+.leaflet-bottom.leaflet-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.leaflet-bottom.leaflet-right .leaflet-draw {
+  margin-bottom: 6px;
+}
 .nav-btn {
   width: 40px; height: 40px; border: 0; border-radius: 6px;
   background: #fff; color: #333; font-size: 20px; font-weight: bold;
@@ -153,6 +168,7 @@ html, body { height: 100%; font-family: Arial, sans-serif; }
   #topbar button {
     width: 100%; font-size: 16px; padding: 12px;
   }
+  #reportHint { white-space: normal; text-align: center; width: 100%; }
   #eventsPanel {
     left: 0; right: 0; top: auto; bottom: 0;
     width: 100%; max-height: 30vh; border-radius: 12px 12px 0 0;
