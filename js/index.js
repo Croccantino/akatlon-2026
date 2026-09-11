@@ -146,6 +146,7 @@ async function aggiornaZonePericolo() {
   for (const ev of incendi) {
     const raggioRosso = raggioAreaRossaEvento(ev);
     const gialla = creaZonaGialla(map, ev.lat, ev.lng, raggioRosso + 60);
+    gialla.bringToFront();
     zonaPericoloGroup.addLayer(gialla);
     try {
       const zona = await creaZonaPericoloDaMeteo(
@@ -159,7 +160,7 @@ async function aggiornaZonePericolo() {
     }
   }
 }
-setInterval(aggiornaZonePericolo, 2000);
+setInterval(aggiornaZonePericolo, 1000);
 
 // === SELEZIONE TIPO EVENTO ===
 const eventTypeSelect = document.getElementById('eventType');

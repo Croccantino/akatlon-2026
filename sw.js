@@ -1,4 +1,4 @@
-const CACHE = 'fireracker-v30';
+const CACHE = 'fireracker-v32';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',

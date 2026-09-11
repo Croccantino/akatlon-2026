@@ -422,9 +422,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   // === PROXY METEO (zona di pericolo) ===
-  if (pathname === '/api/meteo/vento' && method === 'GET') {
-    const lat = parseFloat(url.searchParams.get('lat'));
-    const lng = parseFloat(url.searchParams.get('lng'));
+  if (pathname === '/api/meteo/vento' && (method === 'GET' || method === 'POST')) {
+    let lat = parseFloat(url.searchParams.get('lat'));
+    let lng = parseFloat(url.searchParams.get('lng'));
+    if (method === 'POST') {
+      const b = await getBody(req);
+      lat = parseFloat(b && b.lat);
+      lng = parseFloat(b && b.lng);
+    }
     if (isNaN(lat) || isNaN(lng)) return sendJson(res, 400, { error: 'lat/lng mancanti' });
     try {
       const cacheKey = lat.toFixed(3) + ',' + lng.toFixed(3);

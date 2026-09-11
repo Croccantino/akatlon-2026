@@ -213,8 +213,13 @@ async function ottieniVentoMigliore(lat, lng) {
   const timer = setTimeout(() => ctrl.abort(), 8000);
   try {
     const risposta = await fetch(
-      `/api/meteo/vento?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`,
-      { signal: ctrl.signal }
+      `/api/meteo/vento`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat: lat, lng: lng }),
+        signal: ctrl.signal
+      }
     );
     if (!risposta.ok) throw new Error('Nessun dato vento disponibile (' + risposta.status + ')');
     const dati = await risposta.json();
@@ -243,7 +248,8 @@ async function creaZonaPericoloDaMeteo(map, lat, lng, tipoCombustibile = 'macchi
 
   const modello = calcolaZonaCompleta(vento.velocitaKmh, vento.direzioneGradi, tipoCombustibile);
 
-  const raggioInterno = Math.max(0, Math.min(raggioZonaRossaMetri, modello.raggioFinale));
+  const margineGiallo = 60;
+  const raggioInterno = Math.min(raggioZonaRossaMetri + margineGiallo, modello.raggioFinale);
   if (raggioInterno >= modello.raggioFinale) return null;
 
   const settore = creaZonaPericoloDirezionale(
