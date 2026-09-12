@@ -1,8 +1,8 @@
-const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3000;
+const HTTPS_PORT = 3443;
 const DATA_FILE = path.join(__dirname, 'markers.json');
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 const SHAPES_FILE = path.join(__dirname, 'shapes.json');
@@ -118,6 +118,12 @@ function getBody(req) {
       try { resolve(JSON.parse(body)); } catch (e) { resolve({}); }
     });
   });
+}
+
+function clientIp(req) {
+  const raw = (req.socket && req.socket.remoteAddress) || '';
+  const clean = raw.replace(/^::ffff:/, '');
+  return clean === '::1' ? '127.0.0.1' : clean;
 }
 
 // === PROXY METEO (venti reali per la zona di pericolo) ===
@@ -251,7 +257,7 @@ async function ventoMigliore(lat, lng) {
   return { ...m, fonte: 'Modello meteo (Open-Meteo)' };
 }
 
-const server = http.createServer(async (req, res) => {
+const handler = async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname;
   const method = req.method;
@@ -303,7 +309,7 @@ const server = http.createServer(async (req, res) => {
     if (auth !== getAdminPassword()) return sendJson(res, 401, { error: 'Non autorizzato' });
     const markers = readMarkers();
     const body = await getBody(req);
-    const marker = { ...body, id: Date.now(), createdAt: new Date().toISOString() };
+    const marker = { ...body, id: Date.now(), createdAt: new Date().toISOString(), ipRete: clientIp(req) };
     markers.push(marker);
     writeMarkers(markers);
     broadcast({ type: 'markers' });
@@ -346,7 +352,7 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/events' && method === 'POST') {
     const events = readEvents();
     const body = await getBody(req);
-    const ev = { ...body, id: Date.now(), createdAt: new Date().toISOString() };
+    const ev = { ...body, id: Date.now(), createdAt: new Date().toISOString(), ipRete: clientIp(req) };
     events.push(ev);
     writeEvents(events);
     broadcast({ type: 'events' });
@@ -519,16 +525,28 @@ const server = http.createServer(async (req, res) => {
       res.end(content);
     }
   });
-});
+};
 
-server.listen(PORT, () => {
-  console.log(`Server su http://localhost:${PORT}`);
-  console.log(`Admin su http://localhost:${PORT}/admin`);
-  const net = require('os').networkInterfaces();
+const net = require('os').networkInterfaces();
+const CERT_DIR = path.join(__dirname, 'certs');
+let key, cert;
+try {
+  key = fs.readFileSync(path.join(CERT_DIR, 'server-key.pem'));
+  cert = fs.readFileSync(path.join(CERT_DIR, 'server-cert.pem'));
+} catch (e) {
+  console.error('Certificati HTTPS non trovati in certs/. Esegui: bash scripts/make-certs.sh');
+  process.exit(1);
+}
+
+const server = https.createServer({ key, cert }, handler);
+
+server.listen(HTTPS_PORT, () => {
+  console.log(`Server su https://localhost:${HTTPS_PORT}`);
+  console.log(`Admin su https://localhost:${HTTPS_PORT}/admin`);
   for (const name of Object.keys(net)) {
     for (const iface of net[name]) {
       if (iface.family === 'IPv4' && !iface.internal) {
-        console.log(`IP LAN ${name}: http://${iface.address}:${PORT}`);
+        console.log(`IP LAN ${name}: https://${iface.address}:${HTTPS_PORT}`);
       }
     }
   }

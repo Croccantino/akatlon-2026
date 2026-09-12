@@ -134,7 +134,7 @@ function renderUserEvents() {
     div.innerHTML = `
       <div>
         <div class="name">${icon} ${ev.title}</div>
-        <div class="coords">${ev.lat.toFixed(4)}, ${ev.lng.toFixed(4)}</div>
+        <div class="coords">${ev.lat.toFixed(4)}, ${ev.lng.toFixed(4)}${ev.ipRete ? ' · 📡 ' + ev.ipRete : ''}</div>
       </div>
       <div class="user-event-actions">
         <button class="btn btn-primary" style="width:auto;margin:0;padding:5px 10px;" onclick="useEventPosition(${ev.id})">📌 Aggiungi marker</button>
@@ -145,7 +145,7 @@ function renderUserEvents() {
     list.appendChild(div);
 
     L.marker([ev.lat, ev.lng], { icon: eventPinIcon }).addTo(adminEventGroup)
-      .bindPopup(`<b>${icon} ${ev.title}</b><br>${ev.description || ''}`);
+      .bindPopup(`<b>${icon} ${ev.title}</b><br>${ev.description || ''}${ev.ipRete ? '<br>📡 IP rete: ' + ev.ipRete : ''}`);
   });
 }
 
