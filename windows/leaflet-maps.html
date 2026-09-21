@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Maps - Tutte le Funzionalità</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: Arial, sans-serif; }
+    #map { height: 100%; width: 100%; }
+
+    .custom-button {
+      background-color: #fff;
+      border: 0;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+      margin: 10px;
+      padding: 0 0.5em;
+      font: 400 18px Roboto, Arial, sans-serif;
+      height: 40px;
+      cursor: pointer;
+    }
+    .custom-button:hover { background: rgb(235, 235, 235); }
+
+    .search-container {
+      background-color: #fff;
+      border: 0;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+      margin: 10px;
+      padding: 10px;
+      font: 400 14px Arial, sans-serif;
+    }
+    .search-container input[type="text"] {
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      padding: 8px;
+      font: 400 14px Arial, sans-serif;
+      width: 250px;
+      margin-right: 5px;
+    }
+    .search-container button {
+      background-color: #1a73e8;
+      color: white;
+      border: 0;
+      border-radius: 2px;
+      padding: 8px 16px;
+      font: 400 14px Arial, sans-serif;
+      cursor: pointer;
+    }
+    .search-container button:hover { background-color: #1765cc; }
+
+    .flag-icon { width: 32px; height: 37px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // === 1. MAPPA BASE ===
+    const map = L.map('map').setView([-33.9, 151.2], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // === 2. GEOCODING con Nominatim (gratuito, no API key) ===
+    async function geocode(address) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+        const res = await fetch(url, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.length > 0) {
+          const { lat, lon, display_name } = data[0];
+          return { lat: parseFloat(lat), lon: parseFloat(lon), display_name };
+        }
+        return null;
+      } catch (err) {
+        console.error('Geocoding error:', err);
+        return null;
+      }
+    }
+
+    // === 3. REVERSE GEOCODING (click mappa → indirizzo) ===
+    async function reverseGeocode(lat, lng) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+        const res = await fetch(url, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        return data.display_name;
+      } catch (err) {
+        console.error('Reverse geocoding error:', err);
+        return 'Indirizzo non trovato';
+      }
+    }
+
+    // === 4. GEOLOCATION (come Google Maps) ===
+    let userMarker = null;
+    function locateUser() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            map.setView([latitude, longitude], 12);
+            if (userMarker) map.removeLayer(userMarker);
+            userMarker = L.marker([latitude, longitude]).addTo(map)
+              .bindPopup('<b>Sei qui!</b>').openPopup();
+          },
+          (err) => alert('Errore geolocalizzazione: ' + err.message)
+        );
+      } else {
+        alert('Il tuo browser non supporta la geolocalizzazione');
+      }
+    }
+
+    // === 6. POLYGON (Triangolo delle Bermuda) ===
+    L.polygon([
+      [25.774, -80.19],
+      [18.466, -66.118],
+      [32.321, -64.757]
+    ], {
+      color: '#FF0000',
+      weight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0.35
+    }).addTo(map);
+
+    // === 8. MAP CLICK → REVERSE GEOCODING ===
+    map.on('click', async function(e) {
+      const { lat, lng } = e.latlng;
+      const address = await reverseGeocode(lat, lng);
+      L.popup()
+        .setLatLng(e.latlng)
+        .setContent(`<b>Indirizzo:</b><br>${address}`)
+        .openOn(map);
+    });
+
+    // === 9. CONTROLLI CUSTOM (come Google Maps ControlPosition) ===
+    const CenterControl = L.Control.extend({
+      onAdd: function(map) {
+        const btn = L.DomUtil.create('button', 'custom-button');
+        btn.textContent = '📍 Centra Mappa';
+        btn.title = 'Centra sulla posizione iniziale';
+        btn.onclick = function(e) {
+          L.DomEvent.stopPropagation(e);
+          map.setView([-33.9, 151.2], 10);
+        };
+        return btn;
+      }
+    });
+    new CenterControl({ position: 'topleft' }).addTo(map);
+
+    // Pulsante Geolocalizzazione
+    const LocateControl = L.Control.extend({
+      onAdd: function(map) {
+        const btn = L.DomUtil.create('button', 'custom-button');
+        btn.textContent = '📌 La Mia Posizione';
+        btn.title = 'Trova la tua posizione';
+        btn.onclick = function(e) {
+          L.DomEvent.stopPropagation(e);
+          locateUser();
+        };
+        return btn;
+      }
+    });
+    new LocateControl({ position: 'topleft' }).addTo(map);
+
+    // === 11. BARRA DI RICERCA (Geocoding UI) ===
+    const SearchControl = L.Control.extend({
+      onAdd: function(map) {
+        const container = L.DomUtil.create('div', 'search-container');
+        container.innerHTML = `
+          <input type="text" id="searchInput" placeholder="Cerca un indirizzo..." />
+          <button id="searchBtn">Cerca</button>
+        `;
+        L.DomEvent.disableClickPropagation(container);
+
+        const searchBtn = container.querySelector('#searchBtn');
+        const searchInput = container.querySelector('#searchInput');
+
+        searchBtn.onclick = async function(e) {
+          L.DomEvent.stopPropagation(e);
+          const query = searchInput.value.trim();
+          if (!query) return;
+          const result = await geocode(query);
+          if (result) {
+            map.setView([result.lat, result.lon], 12);
+            L.marker([result.lat, result.lon]).addTo(map)
+              .bindPopup(result.display_name).openPopup();
+          } else {
+            alert('Indirizzo non trovato');
+          }
+        };
+
+        searchInput.onkeypress = function(e) {
+          if (e.key === 'Enter') searchBtn.click();
+        };
+
+        return container;
+      }
+    });
+    new SearchControl({ position: 'topright' }).addTo(map);
+
+    // === 12. CONTROLLI ZOOM (come Google Maps) ===
+    map.addControl(new L.Control.Zoom({ position: 'topleft' }));
+  </script>
+</body>
+</html>

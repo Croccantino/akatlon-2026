@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dati e Risorse - FireTracker</title>
+  <link rel="icon" href="/img/favicon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#e63946" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FireTracker" />
+  <link rel="apple-touch-icon" href="/img/icon-192.png" />
+  <link rel="stylesheet" href="/css/dati.css" />
+</head>
+<body>
+  <header>
+    <a href="/" class="logo"><img src="/img/favicon.png" alt="FireTracker" class="logo-img" /> <span>Fire</span>Tracker</a>
+    <nav>
+      <a href="/">🗺️ Mappa</a>
+      <a href="/contatti">📞 Emergenze</a>
+      <a href="/dati" class="active">📊 Dati</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>📊 Dati su Incendi, Aria e Ambiente</h1>
+    <p class="subtitle">Dati ufficiali e sintesi dalle fonti istituzionali italiane ed europee</p>
+
+    <!-- KEY FIGURES -->
+    <section class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-value">~2%</div>
+        <div class="kpi-label">Incendi boschivi in Italia causati da cause naturali</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">~98%</div>
+        <div class="kpi-label">Incendi boschivi di origine antropica</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">4%</div>
+        <div class="kpi-label">Incendi forestali europei da cause naturali (96% antropiche)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">40-50%</div>
+        <div class="kpi-label">Superficie bruciata da consorzi forestali (70% nel 2017)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">1980</div>
+        <div class="kpi-label">Anno d'inizio raccolta dati CUFAA (Carabinieri Forestali)</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">115</div>
+        <div class="kpi-label">Numero emergenza Vigili del Fuoco</div>
+      </div>
+    </section>
+
+    <!-- 1. ISPRA INCENDI -->
+    <section class="data-block">
+      <h2>🔥 Incendi boschivi in Italia <a class="src" href="https://www.isprambiente.gov.it/it/attivita/Crisi-Emergenze-ambientali-e-Danno/centro-operativo-per-la-sorveglianza-ambientale/ecosistemi-ed-incendi-boschivi-in-italia/inquadramento-del-problema" target="_blank" rel="noopener">(ISPRA)</a></h2>
+      <ul>
+        <li>La raccolta dati è curata dal <strong>Comando Unità Forestali, Ambientali e Agroalimentari (CUFAA)</strong> dei Carabinieri, che colleziona statistiche dal <strong>1980</strong>.</li>
+        <li>Le superfici bruciate e il numero di incendi sono <strong>mediamente in diminuzione</strong> negli ultimi 40 anni grazie alla prevenzione e alla flotta aerea.</li>
+        <li>La <strong>Legge 353/2000</strong> ha contribuito alla riduzione: piani regionali, catasto delle aree percorse dal fuoco e sanzioni pesanti.</li>
+        <li>Tra il <strong>40% e il 50%</strong> del territorio bruciato è costituito da consorzi forestali; eccezione il <strong>2017 (70%)</strong>.</li>
+        <li>In Italia le cause naturali rappresentano circa il <strong>2%</strong> degli incendi; tutti gli altri sono di <strong>origine antropica</strong>.
+          <ul class="nested">
+            <li><em>Colposi</em>: fuochi agricoli, combustione di stoppie, mozziconi, braci non spente.</li>
+            <li><em>Dolosi</em>: appiccati volontariamente per danno o vantaggio.</li>
+          </ul>
+        </li>
+        <li>In Europa: <strong>4% cause naturali, 96% attività umane</strong>.</li>
+        <li>Stagionalità: incendi invernali-primaverili nelle regioni alpine e appenniniche montane; <strong>incendi estivi</strong> in centro-sud e isole (clima mediterraneo).</li>
+        <li>Sanzioni regolate da <strong>L.153/2000</strong>, <strong>art. 423-bis c.p.</strong> (incendio boschivo) e <strong>DL 120/2021</strong>.</li>
+        <li>Strumenti: sistema europeo <strong>EFFIS</strong> (dati satellitari per rischio incendi).</li>
+      </ul>
+      <div class="ref">Fonte: ISPRA - Ecosistemi e incendi boschivi in Italia</div>
+    </section>
+
+    <!-- 2. LEGHE 353/2000 -->
+    <section class="data-block">
+      <h2>⚖️ Legge 353/2000 (n. 353 del 21 novembre 2000) <a class="src" href="https://www.normattiva.it/uri-res/N2Ls?urn%3Anir%3Astato%3Alegge%3A2000-11-21%3B353" target="_blank" rel="noopener">(Normattiva)</a></h2>
+      <ul>
+        <li><strong>Legge-quadro</strong> in materia di incendi boschivi, per la conservazione e la difesa del patrimonio boschivo.</li>
+        <li>Prevede <strong>piani regionali</strong> di previsione, prevenzione e lotta attiva.</li>
+        <li>Istituzione del <strong>catasto delle aree percorse dal fuoco</strong>.</li>
+        <li><strong>Anti-speculazione</strong>: vincoli sui terreni incendiati (divieto di cambio destinazione d'uso / edificazione per almeno 10 anni).</li>
+        <li>Sanzioni severe per chi appicca incendi (penali e amministrative).</li>
+        <li>Considerata la principale causa della riduzione delle superfici bruciate dal 2000 in poi.</li>
+      </ul>
+      <div class="ref">Fonte: Normattiva - Legge 353/2000</div>
+    </section>
+
+    <!-- 3. INCENDIO LEQUILE -->
+    <section class="data-block alert">
+      <h2>🚨 Emergenza incendio di Lequile (29 agosto 2026) <a class="src" href="https://prefettura.interno.gov.it/it/prefetture/lecce/notizie/incendio-nel-territorio-comune-lequile-avvenuto-29-agosto-2026" target="_blank" rel="noopener">(Prefettura di Lecce)</a></h2>
+      <ul>
+        <li>Incendio sviluppatosi il <strong>29 agosto 2026</strong> presso un <strong>impianto di stoccaggio e trattamento rifiuti</strong> lungo la <strong>S.S. 101</strong> nel Comune di Lequile (LE).</li>
+        <li><strong>ARPA Puglia</strong> e <strong>ASL Lecce</strong> hanno avviato fin dalle prime ore rilievi della qualità dell'aria con strumentazione portatile.</li>
+        <li>Installati <strong>2 campionatori ad alto volume</strong> nell'abitato di Lequile per analizzare microinquinanti, <strong>incluse le diossine</strong>.</li>
+        <li>Primi risultati: <strong>significativa ricaduta degli inquinanti</strong> nelle ore più intense dell'incendio e nelle aree prossime al sito, con successiva e costante diminuzione.</li>
+        <li>Aumento di <strong>PM10 e PM2,5</strong> tra il 28 e il 30 agosto nelle province di <strong>Lecce e Brindisi</strong>, influenzato anche da <strong>polveri sahariane</strong>.</li>
+        <li><strong>ASL Lecce</strong>: piano straordinario di campionamenti entro <strong>2 km</strong> dal sito (aziende agricole, produzioni alimentari, ristorazione, pozzo Acquedotto Pugliese, allevamenti e lattiero-caseari).</li>
+        <li>Monitoraggio con <strong>droni</strong> del sito e delle aree sensibili.</li>
+        <li>Coinvolti: ARPA Puglia, ASL Lecce, <strong>Università del Salento</strong>, CCS in Prefettura.</li>
+        <li>Aggiornamento ufficiale: <a href="https://prefettura.interno.gov.it/it/prefetture/lecce/notizie/incendio-sviluppatosi-29-agosto-2026-lequile-aggiornamento" target="_blank" rel="noopener">1° settembre 2026</a>.</li>
+      </ul>
+      <div class="ref">Fonte: Prefettura - U.T.G. di Lecce (aggiornato 3 settembre 2026)</div>
+    </section>
+
+    <!-- 4. ARPA PUGLIA -->
+    <section class="data-block">
+      <h2>🌫️ ARPA Puglia - Qualità dell'aria <a class="src" href="https://www.arpa.puglia.it/pagina2806_rete-regionale-di-monitoraggio-della-qualit-dellaria.html" target="_blank" rel="noopener">(ARPA Puglia)</a></h2>
+      <ul>
+        <li>La <strong>Rete Regionale di Monitoraggio della Qualità dell'Aria</strong> misura in continuo gli inquinanti atmosferici sul territorio pugliese.</li>
+        <li>Parametri rilevati: <strong>PM10, PM2,5, NO₂, SO₂, O₃, CO, benzene</strong> e metalli.</li>
+        <li>I dati sono forniti come <strong>medie orarie e giornaliere</strong> per stazione, con indicizzazione rispetto ai limiti di legge (D.Lgs. 155/2010).</li>
+        <li>Nel monitoraggio degli incendi viene usato anche per la verifica di <strong>microinquinanti e diossine</strong> tramite campionatori ad alto volume.</li>
+        <li>Stazioni dislocate in tutte le province pugliesi (Bari, Taranto, Brindisi, Lecce, Foggia, BAT).</li>
+      </ul>
+      <div class="ref">Fonte: ARPA Puglia - Rete regionale di monitoraggio qualità dell'aria</div>
+    </section>
+
+    <!-- 5. SNPA -->
+    <section class="data-block">
+      <h2>🧪 SNPA - Inquinamento dell'aria <a class="src" href="https://www.snpambiente.it/temi/inquinamento/" target="_blank" rel="noopener">(SNPA)</a> · <a class="src" href="https://www.snpambiente.it/temi/inquinamento/aria/" target="_blank" rel="noopener">(pagina aria)</a></h2>
+      <ul>
+        <li>Il <strong>SNPA</strong> (Sistema Nazionale per la Protezione dell'Ambiente) coordina le Agenzie regionali (ARPA/APPA) e ISPRA.</li>
+        <li>Centro di riferimento per <strong>dati e indicatori</strong> ufficiali su aria, acqua, suolo, rifiuti e rumore.</li>
+        <li>Pubblica rapporti nazionali sulla qualità dell'aria e <strong>indicatori di esposizione</strong> della popolazione agli inquinanti.</li>
+        <li>Supporta l'<strong>analisi degli eventi</strong> come gli incendi (ricadute inquinanti, PM, diossine).</li>
+      </ul>
+      <div class="ref">Fonte: SNPA - Inquinamento / Qualità dell'aria</div>
+    </section>
+
+    <!-- 6. MINISTERO SALUTE / ISS -->
+    <section class="data-block">
+      <h2>🩺 Ministero della Salute & ISS - Inquinanti e diossine <a class="src" href="https://www.salute.gov.it/portale/temi/p2_5.jsp?lingua=italiano&area=Inquinamento+atmosferico&menu=inquinanti" target="_blank" rel="noopener">(Ministero Salute)</a> · <a class="src" href="https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/d/diossine" target="_blank" rel="noopener">(ISS)</a></h2>
+      <ul>
+        <li>Il Ministero della Salute raccoglie dati e orientamenti su <strong>inquinanti atmosferici</strong> e relativi effetti sanitari.</li>
+        <li>Le <strong>diossine</strong> sono composti organici persistenti, generati da <strong>combustione incompleta</strong> (incendi domestici e industriali, roghi di rifiuti).</li>
+        <li>Effetti sulla salute: danni a sistema immunitario, <strong>effetti cancerogeni</strong> (gruppo 1 IARC per la 2,3,7,8-TCDD), effetti endocrini e riproduttivi.</li>
+        <li>La principale esposizione per la popolazione avviene tramite <strong>alimentazione</strong> (bioaccumulo nella catena alimentare).</li>
+        <li>In caso di incendi di impianti di rifiuti, le autorità sanitarie dispongono <strong>campionamenti straordinari</strong> di aria, suolo e produzioni alimentari.</li>
+      </ul>
+      <div class="ref">Fonte: ISS (ISSalute - Diossine) e Ministero della Salute</div>
+    </section>
+
+    <!-- 7. ECOMPAFIA -->
+    <section class="data-block">
+      <h2>🦹 Rapporto Ecomafia (Legambiente) <a class="src" href="https://noecomafia.legambiente.it/" target="_blank" rel="noopener">(NoEcomafia)</a></h2>
+      <ul>
+        <li>Il rapporto è redatto ogni anno da <strong>Legambiente dal 1994</strong>, sui reati ambientali in Italia.</li>
+        <li>Misure dei <strong>reati ambientali accertati</strong>, con focus su rifiuti, cemento, incendi, agromafia e criminalità.</li>
+        <li>Settore incendi nel novero dei reati, con <strong>dati sugli incendi dolosi e colposi</strong> e sulla speculazione edilizia sui terreni bruciati (Legge 353/2000).</li>
+        <li>Pubblica i dati delle <strong>vaste bonifiche e discariche abusive</strong>, che spesso sono cause di roghi.</li>
+        <li>Edizione 2025 disponibile sul portale con report completo scaricabile.</li>
+      </ul>
+      <div class="ref">Fonte: Legambiente - NoEcomafia 2025</div>
+    </section>
+
+    <!-- 8. EARTH NULLSCHOOL -->
+    <section class="data-block">
+      <h2>🌍 Earth Nullschool - Mappa dei venti e dei flussi <a class="src" href="https://earth.nullschool.net/" target="_blank" rel="noopener">(Earth)</a></h2>
+      <ul>
+        <li>Visualizzazione globale in tempo reale di <strong>venti, correnti, temperatura e inquinanti</strong> (PM2,5).</li>
+        <li>Utilissima per prevedere la <strong>direzione di propagazione delle polveri e del fumo</strong> degli incendi.</li>
+        <li>Strati disponibili: vento a varie altitudini, <strong>polveri sottili (PM2,5)</strong>, CO, particolato marino.</li>
+        <li>Mappa interattiva basata su dati <strong>GFS (NOAA)</strong> in tempo reale.</li>
+      </ul>
+      <div class="ref">Fonte: Earth Nullschool</div>
+    </section>
+
+    <!-- 9. ISTAT -->
+    <section class="data-block">
+      <h2>🌾 ISTAT - Agricoltura <a class="src" href="https://www.istat.it/statistiche-per-temi/economia/agricoltura/" target="_blank" rel="noopener">(ISTAT)</a></h2>
+      <ul>
+        <li>Statistiche ufficiali su <strong>superfici agricole, produzioni e aziende</strong> in Italia.</li>
+        <li>Dati utili per valutare l'<strong>impatto degli incendi su colture e territori rurali</strong>.</li>
+        <li>Consentono di incrociare le aree bruciate con le <strong>destinazioni produttive</strong> dei terreni.</li>
+        <li>Fonti: Censimenti dell'agricoltura, statistiche correnti, conti economici.</li>
+      </ul>
+      <div class="ref">Fonte: ISTAT - Statistiche per temi: Agricoltura</div>
+    </section>
+
+    <!-- 10. SIT PUGLIA / PPTR -->
+    <section class="data-block">
+      <h2>🗺️ SIT Puglia e PPTR - Pianificazione territoriale <a class="src" href="https://pugliacon.regione.puglia.it/web/sit-puglia-sit/pianificazione-regionale" target="_blank" rel="noopener">(SIT Puglia)</a> · <a class="src" href="https://pugliacon.regione.puglia.it/web/sit-puglia-sit/pptr-piano-paesaggistico-territoriale-regionale" target="_blank" rel="noopener">(PPTR)</a></h2>
+      <ul>
+        <li>Il <strong>Sistema Informativo Territoriale (SIT)</strong> della Regione Puglia gestisce cartografia e dati geografici regionali.</li>
+        <li>Il <strong>PPTR</strong> (Piano Paesaggistico Territoriale Regionale) disciplina l'uso del territorio e i vincoli paesaggistici.</li>
+        <li>Dati rilevanti per il monitoraggio delle <strong>aree percorse dal fuoco</strong> e dei vincoli (Legge 353/2000).</li>
+        <li>Offre <strong>layer cartografici</strong> consultabili (usi del suolo, vincoli, aree protette).</li>
+      </ul>
+      <div class="ref">Fonte: SIT Puglia - Pianificazione Regionale / PPTR</div>
+    </section>
+
+    <section class="disclaimer">
+      ⚠️ I dati riportati sono una <strong>sintesi informativa</strong> tratta dalle fonti ufficiali indicate. Per dati aggiornati e certificati fare sempre riferimento ai portali originali. Le valutazioni ufficiali sugli eventi (ARPA, ASL, Prefettura) sono gli unici riferimenti istituzionali validi.
+    </section>
+  </main>
+
+  <footer>🔥 FireTracker &copy; <span id="year"></span> - Dati e risorse sugli incendi in Italia</footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>
