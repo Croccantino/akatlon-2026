@@ -2,7 +2,7 @@
 # Genera una CA locale + certificato HTTPS per FireTracker.
 # Va rilanciato se cambia l'IP della rete (lo fa firetraker in automatico).
 set -e
-cd /home/zompi/disco_win/akalon
+cd /home/zompi/disco_win/akalon/ubuntu
 mkdir -p certs
 cd certs
 
